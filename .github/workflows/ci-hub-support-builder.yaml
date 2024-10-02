@@ -1,0 +1,53 @@
+name: ci-hub-support-builder
+
+on:
+  push:
+    tags: [ 'ci-hub-support-v*' ]       
+  pull_request:
+    branches: [ main ]
+    paths: ['ci-hub-support/**', '.github\/workflows\/ci-hub-support*' ]
+      
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build image for PR
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          CI_HUB_SUPPORT: ghcr.io/devtools-qe-incubator/ci-hub-support
+          CI_HUB_SUPPORT_V: pr-${{ github.event.number }}
+        run: |
+          make ci-hub-support-oci-build
+          make ci-hub-support-oci-save
+          echo "image=${CI_HUB_SUPPORT}:${CI_HUB_SUPPORT_V}" >> "$GITHUB_ENV"
+  
+      - name: Build image for Release
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          make ci-hub-support-oci-build
+          make ci-hub-support-oci-save
+          echo "image=$(sed -n 1p ci-hub-support/release-info):v$(sed -n 2p ci-hub-support/release-info)" >> "$GITHUB_ENV"
+
+      - name: Create image metadata
+        run: |
+          echo ${{ env.image }} > ci-hub-support-image
+          echo ${{ github.event_name }} > ci-hub-support-build-event
+  
+      - name: Upload ci-hub-support
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-hub-support
+          path: ci-hub-support*
+
+
+
+
+
+
+
+
+     
