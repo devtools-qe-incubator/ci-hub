@@ -12,7 +12,7 @@ CI_HUB_SUPPORT_SAVE ?= ci-hub-support
 ci-hub-support-oci-build: CONTEXT=ci-hub-support
 ci-hub-support-oci-build: MANIFEST=$(CI_HUB_SUPPORT):$(CI_HUB_SUPPORT_V)
 ci-hub-support-oci-build:
-	${CONTAINER_MANAGER} build -t $(MANIFEST) -f $(CONTEXT)/Containerfile $(CONTEXT)
+	${CONTAINER_MANAGER} build -t $(MANIFEST) -f $(CONTEXT)/oci/Containerfile $(CONTEXT)
 
 ci-hub-support-oci-save:
 	${CONTAINER_MANAGER} save -o $(CI_HUB_SUPPORT_SAVE).tar $(CI_HUB_SUPPORT):$(CI_HUB_SUPPORT_V)
